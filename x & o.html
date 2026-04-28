@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: gray;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: black;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+            justify-content: center;
+            margin-top: 100px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid #000;
+            border-radius: 20px;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* ✅ إضاءة خلف المربعات */
+        }
+
+        .cell:hover {
+            background-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 0 15px rgba(0, 0, 255, 0.5); /* ✅ تأثير الإضاءة عند التحريك */
+            transform: scale(1.05);
+        }
+
+        .winner-cell {
+            background-color: #90EE90 !important;
+        }
+
+        #winner {
+            margin-top: 20px;
+            font-size: 24px;
+            color: #ff5722;
+        }
+
+        #reset {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            position: relative;
+        }
+
+        /* ✅ تأثير الإضاءة عند تحريك الماوس فوق الزر */
+        #reset:hover {
+            background-color: #45a049;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+            transform: scale(1.1);
+        }
+
+        .score-table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 200px;
+            font-size: 20px;
+        }
+
+        .score-table th, .score-table td {
+            border: 2px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .score-table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+       
+    </style>
+</head>
+<body>
+
+    <div class="navbar">Tic Tac Toe</div>
+
+    <div class="board" id="board">
+        <div class="cell" id="0"></div>
+        <div class="cell" id="1"></div>
+        <div class="cell" id="2"></div>
+        <div class="cell" id="3"></div>
+        <div class="cell" id="4"></div>
+        <div class="cell" id="5"></div>
+        <div class="cell" id="6"></div>
+        <div class="cell" id="7"></div>
+        <div class="cell" id="8"></div>
+    </div>
+
+    <h2 id="winner"></h2>
+
+    <table class="score-table">
+        <tr>
+            <th>Player</th>
+            <th>Wins</th>
+        </tr>
+        <tr>
+            <td>X</td>
+            <td id="xWins">0</td>
+        </tr>
+        <tr>
+            <td>O</td>
+            <td id="oWins">0</td>
+        </tr>
+    </table>
+
+    <button id="reset" onclick="resetGame()">Play Again</button>
+    <span style="margin-left: 15px; font-size: 16px; font-weight: bold; color: gold;">by / Eng: Ayoub Fadi</span>
+    
+    <script>
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "X";
+        let xWins = 0;
+        let oWins = 0;
+        const cells = document.querySelectorAll(".cell");
+
+        function checkWinner() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            
+            for (let pattern of winPatterns) {
+                let [a, b, c] = pattern;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    document.getElementById("winner").innerText = `🎉 Player ${currentPlayer} Wins! 🎉`;
+                    document.getElementById(a).classList.add("winner-cell");
+                    document.getElementById(b).classList.add("winner-cell");
+                    document.getElementById(c).classList.add("winner-cell");
+
+                    if (currentPlayer === "X") {
+                        xWins++;
+                        document.getElementById("xWins").innerText = xWins;
+                    } else {
+                        oWins++;
+                        document.getElementById("oWins").innerText = oWins;
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function checkDraw() {
+            if (!board.includes("") && !document.getElementById("winner").innerText) {
+                document.getElementById("winner").innerText = "It's a Draw! 🤝";
+                return true;
+            }
+            return false;
+        }
+
+        function handleClick(event) {
+            let index = event.target.id;
+            if (board[index] === "" && !document.getElementById("winner").innerText) {
+                board[index] = currentPlayer;
+                event.target.innerText = currentPlayer;
+                
+                if (checkWinner() || checkDraw()) return;
+                
+                currentPlayer = currentPlayer === "X" ? "O" : "X";
+            }
+        }
+
+        function resetGame() {
+            board = ["", "", "", "", "", "", "", "", ""];
+            currentPlayer = "X";
+            document.getElementById("winner").innerText = "";
+            cells.forEach(cell => {
+                cell.innerText = "";
+                cell.classList.remove("winner-cell");
+            });
+        }
+
+        cells.forEach(cell => cell.addEventListener("click", handleClick));
+    </script>
+</body>
+</html>
